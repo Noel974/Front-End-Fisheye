@@ -1,82 +1,203 @@
-class Profil {
-  constructor() {
-      this.profilPhotographe = document.querySelector('#profil-infos-photographe');
-      this.profilListePhotos = document.querySelector('#profil-liste-photos');
-      this.profilLikes = document.querySelector('#profil-likes');
-      this.profilTarif = document.querySelector('#profil-tarif');
+import { PhotographerApi, MediaApi } from '../api/Api.js'
 
-      this.photographesApi = new PhotographeApi('../assets/data/photographers.json');
-  }
+import { MediaFactory } from '../factories/MediaFactory.js'
 
-  async main() {
-      let idURL = new URL(window.location.href).searchParams.get("id");
-      let nomPhotographe = "";
-      switch (idURL) {
-          case "243":
-              nomPhotographe = "Mimi";
-              break;
-          case "930":
-              nomPhotographe = "Ellie_Rose";
-              break;
-          case "82":
-              nomPhotographe = "Tracy";
-              break;
-          case "527":
-              nomPhotographe = "Nabeel";
-              break;
-          case "925":
-              nomPhotographe = "Rhode";
-              break;
-          case "195":
-              nomPhotographe = "Marcel";
-              break;
-          default:
-              break;
-      }
+import { Photographer } from '../models/index.js'
 
-      let photographesData = await this.photographesApi.getPhotographes();
-      let Photographe = photographesData.map(photographe => new ProfilPhotographeFactory(photographe, idURL));
-      Photographe.forEach(photographe => {
-          const ProfilTemplate = new PhotographeProfil(photographe, idURL);
-          this.profilPhotographe.append(
-              ProfilTemplate.createPhotographeProfil()
-          );
-          if (photographe.id == idURL) {
-              this.profilTarif.append(
-                  `${photographe.price}€ / jour`
-              )
-          }
-      });
+import { PhotographerCard } from '../templates/PhotographerCard.js'
+import { VideoCard } from '../templates/VideoCard.js'
+import { PictureCard } from '../templates/PictureCard.js'
+import { PriceAndLikesCard } from '../templates/PriceAndLikesCard.js'
+import { SorterForm } from '../templates/SorterForm.js'
 
-      let photosData = await this.photographesApi.getPhotos();
-      let Photo = photosData.map(photo => new PhotoFactory(photo, idURL));
-      Photo.forEach(photo => {
-          if ("image" in photo) {
-              let PhotoTemplate = new PhotographePhoto(photo, idURL, nomPhotographe);
-              this.profilListePhotos.append(
-                  PhotoTemplate.createPhotographeGallerie()
-              );
-          } else {
-              let PhotoTemplate = new PhotographeVideo(photo, idURL, nomPhotographe);
-              this.profilListePhotos.append(
-                  PhotoTemplate.createPhotographeGallerie()
-              );
-          }
-      });
+import { Sorter } from '../utils/sorter/Sorter.js'
+import { Lightbox } from '../utils/lightbox/Lightbox.js'
 
-      let Likes = await this.photographesApi.getLikes();
-      let nbLikeTotal = 0;
-      Likes.forEach(like => {
-          if (like.photographerId == idURL) {
-              nbLikeTotal = nbLikeTotal + like.likes;
-          }
-      });
-      let LikeTemplate = new PhotographeLike(nbLikeTotal);
-      this.profilLikes.append(
-          LikeTemplate.createLikesProfil()
-      );
-  }
+export class PhotographerPage {
+    constructor() {
+        // Elements du DOM
+        this.main = document.getElementById('main')
+        this.mediaSection = document.querySelector('.media')
+
+        // Api
+        this.photographerApi = new PhotographerApi('/data/photographers.json')
+        this.mediaApi = new MediaApi('/data/photographers.json')
+
+        // Url de la page
+        this.url = new URL(window.location)
+
+        // Id du photographe
+        this.id = this.getPhotographerIdFromUrl()
+
+        // Photographes
+        this.photographerFiltered = null
+
+        // Media filtrés
+        this.mediaFiltered = []
+    }
+
+    getPhotographerIdFromUrl() {
+        const params = new URLSearchParams(this.url.search)
+
+        // Retourne l'id du photographe contenu dans le lien
+        return parseInt(params.get('photographerId'), 10)
+    }
+
+    // Retourne la valeur de 'sorter' de l'url de la page
+    getSorterFromURL() {
+        const params = this.url.searchParams
+        return params.get('sorter')
+    }
+
+    async fetchPhotographerFiltered() {
+        // Retourne le tableau de photographes
+        const photographersData = await this.photographerApi.getPhotographers()
+        const photographerDataFiltered = this.findPhotographer(
+            photographersData,
+            this.id
+        )
+
+        return new Photographer(photographerDataFiltered)
+    }
+
+    findPhotographer(photographers, photographerId) {
+        return photographers.find(
+            (photographer) => photographer.id === photographerId
+        )
+    }
+
+    async fetchMediaFiltered() {
+        // Retourne le tableau des media du photographe correspondant à l'id récupéré
+        const mediaData = await this.mediaApi.getMedia()
+        const mediaDataFiltered = this.filterMedia(mediaData, this.id)
+        const videoData = mediaDataFiltered
+            .filter((media) => media.video)
+            .map((video) => new MediaFactory(video, 'video'))
+        const pictureData = mediaDataFiltered
+            .filter((media) => media.image)
+            .map((picture) => new MediaFactory(picture, 'picture'))
+
+        return videoData.concat(pictureData)
+    }
+
+    filterMedia(media, photographerId) {
+        // Retourne les media du photographe
+        return media.filter((media) => media.photographerId === photographerId)
+    }
+
+    displayPhotographerHeader(photographer) {
+        const photographerCard = new PhotographerCard(photographer)
+
+        // Affiche l'entête du photographe
+        photographerCard.getPhotographerHeader()
+    }
+
+    displayPriceAndLikesOfMedia(likes, price) {
+        const priceAndLikesCard = new PriceAndLikesCard(likes, price)
+        const divItem = priceAndLikesCard.getPriceAndLikesDom()
+
+        // Affiche la div du prix et des likes
+        this.main.appendChild(divItem)
+    }
+
+    getLikes(data) {
+        let array = []
+
+        for (const element of data) {
+            array.push(element.likes)
+        }
+
+        // Retourne un tableau contenant les likes de chaque media
+        return array
+    }
+
+    getSumLikes(array) {
+        let sumLikes
+
+        sumLikes = array.reduce(
+            (previousValue, currentValue) => previousValue + currentValue
+        )
+
+        // Retourne la somme total de likes des media
+        return sumLikes
+    }
+
+    displayMediaByLike(media, photographer) {
+        const mediaSorted = new Sorter(media, 'like').mediaSorted()
+
+        mediaSorted.forEach((media) => {
+            if (media.video) {
+                const videoCard = new VideoCard(media, photographer)
+                this.mediaSection.appendChild(videoCard.getVideoCardDom())
+                this.main.appendChild(this.mediaSection)
+            } else if (media.image) {
+                const pictureCard = new PictureCard(media, photographer)
+                this.mediaSection.appendChild(pictureCard.getPictureCardDom())
+                this.main.appendChild(this.mediaSection)
+            } else {
+                throw new Error('Unknown type format')
+            }
+        })
+
+        Lightbox.init()
+    }
+
+    async init() {
+        // Récupère les datas du photographe
+        this.photographerFiltered = await this.fetchPhotographerFiltered()
+
+        // Affiche l'entête du photographe
+        this.displayPhotographerHeader(this.photographerFiltered)
+
+        // Récupère les datas des media dans un tableau
+        this.mediaFiltered = await this.fetchMediaFiltered()
+
+        // likes des media
+        const likes = this.getLikes(this.mediaFiltered)
+
+        // le total des likes des media
+        const sumLikes = this.getSumLikes(likes)
+
+        // Affiche le total du prix et des likes des media
+        this.displayPriceAndLikesOfMedia(
+            sumLikes,
+            this.photographerFiltered.price
+        )
+
+        let sorter = this.getSorterFromURL()
+
+        /*
+            si la valeur du trieur est fausse,
+            l'utilisateur est redirigé vers le trieur par défaut : like
+        */
+        if (!['like', 'date', 'title'].includes(this.sorter)) {
+            /* 
+                Met à jour le paramètre 'sorter' dans l'url de la page
+                Rafraîchi le DOM
+            */
+            this.url.searchParams.set('sorter', 'like')
+            window.history.pushState({}, '', this.url)
+            sorter = 'like'
+        }
+
+        // Formulaire qui affiche les media triés en fonction du bouton de tri
+        const sorterForm = new SorterForm(
+            this.mediaFiltered,
+            this.photographerFiltered,
+            sorter
+        )
+
+        // Initialise le formulaire des media
+        sorterForm.init()
+
+        // Afficher le nom du photographe dans le formulaire de contact
+        const photographerNameContactForm = document.querySelector(
+            '.modal__header__photographer_name'
+        )
+
+        photographerNameContactForm.textContent = `${this.photographerFiltered.name}`
+    }
 }
 
-const profil = new Profil();
-profil.main()
+const photographerPage = new PhotographerPage()
+photographerPage.init()
