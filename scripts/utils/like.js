@@ -54,6 +54,8 @@ export class LikesManager {
             this.likesArray[mediaIndex]++;
             return this.likesArray[mediaIndex];
         }
+// Appelez la méthode augmenterLikes depuis votre instance de PriceAndLikesCard
+priceAndLikesCard.augmenterLikes(mediaId);
 
         // Si le média n'est pas trouvé, renvoie -1 pour indiquer l'échec
         return -1;

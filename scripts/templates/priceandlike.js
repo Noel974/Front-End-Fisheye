@@ -6,6 +6,7 @@ export class PriceAndLikesCard {
         this.price = new Price(price);
         this.likesManager = new LikesManager(); // Crée une instance de LikesManager
         this.likes = new Likes(likes);
+        this.totalLikes = 0; // Initialisez le total des likes à zéro
     }
 
     // Renvoie un élément div du DOM représentant la carte de prix et de likes
@@ -23,8 +24,23 @@ export class PriceAndLikesCard {
     augmenterLikes(mediaId) {
         const likesMisAJour = this.likesManager.augmenterLikes(mediaId);
         if (likesMisAJour !== -1) {
+            this.totalLikes++; // Incrémente le total des likes
             const contenuLike = this.likes.getLikesDom().querySelector('.likeContent');
             contenuLike.querySelector('.likes').textContent = likesMisAJour;
+    
+            // Met à jour l'affichage du total des likes
+            const totalLikesElement = document.querySelector('.total-likes');
+            if (totalLikesElement) {
+                totalLikesElement.textContent = `Total des likes : ${this.totalLikes}`;
+            }
         }
+    }
+
+    // Méthode pour afficher le total des likes
+    displayTotalLikes() {
+        const totalLikesElement = document.createElement('div');
+        totalLikesElement.setAttribute('class', 'total-likes');
+        totalLikesElement.textContent = `Total des likes : ${this.totalLikes}`;
+        return totalLikesElement;
     }
 }

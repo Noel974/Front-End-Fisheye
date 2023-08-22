@@ -13,15 +13,3 @@
 @import url("Base/base.css");
 @import url("Base/brtn.css");
 @import url("Base/icon.css");
-
-.subContent {
-    position: absolute;
-    right: 0;
-    bottom: 0;
-    z-index: 10;
-    display: flex;
-}
-
-.media__item {
-    position: relative;
-}

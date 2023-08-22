@@ -12,39 +12,44 @@ class PictureCard {
     }
 
     getPictureCardDom() {
-        const mediaItem = document.createElement('div')
+        const mediaItem = document.createElement('div');
+        const imageName = this.image.replace('.jpg', '').replaceAll('_', ' ');
 
-        const imageName = this.image
-            .replace('.jpg', '')
-            .replaceAll('_', ' ')
+        mediaItem.setAttribute('class', 'media__item');
 
-        mediaItem.setAttribute('class', 'media__item')
-        console.log(`../../assets/media/${this.photographerName}/${this.image}`)
-        mediaItem.innerHTML = `
-            <a 
-                href="../assets/media/${this.photographerName}/${this.image}"
-                alt="${this.title}"
-            >
+        const likeButton = document.createElement('button');
+        likeButton.setAttribute('class', 'like-button');
+        likeButton.innerHTML = `
+        <div class="subContent">
+        <span class="likes">${this.likes}</span>
+        <button class="like-button">
+            <i class="fa-solid fa-heart icon" data-fa-transform="up-1"></i>
+        </button>
+        
+        </div>
             
-                <img 
-                    src="assets/media/${this.photographerName}/${this.image}" 
-                    alt="${imageName}, closeup view"
-                >
+        `;
+
+        likeButton.addEventListener('click', () => {
+            this.likes++; // Augmenter le compteur de likes
+            likeButton.querySelector('.likes').textContent = this.likes; // Mettre à jour l'affichage des likes
+        });
+
+        mediaItem.innerHTML = `
+            <a href="../assets/media/${this.photographerName}/${this.image}" alt="${this.title}">
+                <img src="assets/media/${this.photographerName}/${this.image}" alt="${imageName}, closeup view">
                 <div class="content">
                     <span class="title">${this.title}</span>
                 </div>
-                
             </a>
-            <div class="subContent">
-                        <span class="likes">${this.likes}</span>
-                        <i 
-                            class="fa-solid fa-heart icon"
-                            data-fa-transform="up-1"
-                        >
-                        </i>    
-                    </div>
-        `
+        `;
 
-        return mediaItem
+        const subContent = document.createElement('div');
+        subContent.setAttribute('class', 'subContent');
+        subContent.appendChild(likeButton);
+
+        mediaItem.appendChild(subContent);
+
+        return mediaItem;
     }
-}
+}    

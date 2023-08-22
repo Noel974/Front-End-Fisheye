@@ -31,7 +31,13 @@
     border-radius: 0.313rem;
     transition: opacity 250ms;
   }
-  
+  .like-button {
+    background: none;
+    display:flex;
+    border: none; 
+    padding: 0; 
+}
+
   .btn_sorter {
     position: relative;
     padding: 1rem 4rem 1rem 2rem;
