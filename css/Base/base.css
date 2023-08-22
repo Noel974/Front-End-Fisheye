@@ -1,0 +1,17 @@
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+}
+body a {
+  text-decoration: none;
+}
+
+body {
+  font-family: "DM Sans", sans-serif;
+  font-weight: 400;
+}

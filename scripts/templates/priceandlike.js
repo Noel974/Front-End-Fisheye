@@ -1,27 +1,30 @@
-import { Price } from '..utils/price.js';
-import { Likes } from '../utils/like.js';
+import { Price } from '../utils/price.js';
+import { Likes, LikesManager } from '../utils/like.js'; // Importe également LikesManager
 
-// Exporte la classe PriceAndLikesCard pour qu'elle puisse être utilisée dans d'autres fichiers
 export class PriceAndLikesCard {
-    // Constructeur de la classe PriceAndLikesCard
     constructor(likes, price) {
         this.price = new Price(price);
+        this.likesManager = new LikesManager(); // Crée une instance de LikesManager
         this.likes = new Likes(likes);
     }
 
-    // Méthode qui crée et renvoie un élément div du DOM représentant la carte de prix et de likes
+    // Renvoie un élément div du DOM représentant la carte de prix et de likes
     getPriceAndLikesDom() {
-        // Crée un élément div
         const div = document.createElement('div');
-
-        // Ajoute la classe CSS 'priceAndLikes' à l'élément div
         div.setAttribute('class', 'priceAndLikes');
 
-        // Ajoute les éléments du DOM représentant les likes et le prix à l'élément div
         div.appendChild(this.likes.getLikesDom());
         div.appendChild(this.price.getPriceDom());
 
-        // Renvoie l'élément div créé
         return div;
+    }
+
+    // Utilisez cette méthode pour augmenter les likes en utilisant LikesManager
+    augmenterLikes(mediaId) {
+        const likesMisAJour = this.likesManager.augmenterLikes(mediaId);
+        if (likesMisAJour !== -1) {
+            const contenuLike = this.likes.getLikesDom().querySelector('.likeContent');
+            contenuLike.querySelector('.likes').textContent = likesMisAJour;
+        }
     }
 }

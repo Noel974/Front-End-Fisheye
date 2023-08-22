@@ -1,0 +1,29 @@
+.sorter {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  width: 20rem;
+  margin: 2rem 0 0 6.25rem;
+  font-size: 1.125rem;
+  font-weight: 700;
+}
+.sorter___title {
+  margin: 0;
+}
+.sorter__list {
+  display: none;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+@media screen and (max-width: 768px) {
+  .sorter {
+    flex-direction: column;
+    align-items: center;
+    width: 85%;
+    margin: auto;
+  }
+  .sorter__title {
+    margin: 2rem 0 1rem;
+  }
+}

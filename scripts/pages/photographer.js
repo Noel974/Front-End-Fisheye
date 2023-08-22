@@ -1,17 +1,18 @@
-import { PhotographerApi, MediaApi } from '../api/Api.js'
+import { PhotographerApi, MediaApi } from '../Api/api.js'
 
-import { MediaFactory } from '../factories/MediaFactory.js'
+import { Media } from '../factories/Media.js'
 
 import { Photographer } from '../models/index.js'
-
-import { PhotographerCard } from '../templates/PhotographerCard.js'
+import { PhotographerCard } from '../templates/index.js'
 import { VideoCard } from '../templates/VideoCard.js'
 import { PictureCard } from '../templates/PictureCard.js'
-import { PriceAndLikesCard } from '../templates/PriceAndLikesCard.js'
+import { PriceAndLikesCard } from '../templates/priceandlike.js'
 import { SorterForm } from '../templates/SorterForm.js'
+// Importez LikesManager ici
+import { LikesManager } from '../utils/like.js';
 
-import { Sorter } from '../utils/sorter/Sorter.js'
-import { Lightbox } from '../utils/lightbox/Lightbox.js'
+import { Sorter } from '../utils/Sorter.js'
+import { Lightbox } from '../utils/Lightbox.js'
 
 export class PhotographerPage {
     constructor() {
@@ -34,6 +35,9 @@ export class PhotographerPage {
 
         // Media filtrés
         this.mediaFiltered = []
+
+        // Créez une instance de LikesManager
+        this.likesManager = new LikesManager();
     }
 
     getPhotographerIdFromUrl() {
@@ -72,10 +76,10 @@ export class PhotographerPage {
         const mediaDataFiltered = this.filterMedia(mediaData, this.id)
         const videoData = mediaDataFiltered
             .filter((media) => media.video)
-            .map((video) => new MediaFactory(video, 'video'))
+            .map((video) => new Media(video, 'video'))
         const pictureData = mediaDataFiltered
             .filter((media) => media.image)
-            .map((picture) => new MediaFactory(picture, 'picture'))
+            .map((picture) => new Media(picture, 'picture'))
 
         return videoData.concat(pictureData)
     }
@@ -86,10 +90,10 @@ export class PhotographerPage {
     }
 
     displayPhotographerHeader(photographer) {
-        const photographerCard = new PhotographerCard(photographer)
+        const photographercard = new PhotographerCard(photographer)
 
         // Affiche l'entête du photographe
-        photographerCard.getPhotographerHeader()
+        photographercard.getPhotographerHeader()
     }
 
     displayPriceAndLikesOfMedia(likes, price) {

@@ -1,0 +1,32 @@
+
+.header {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    height: 5.625rem;
+  }
+  .header__logo {
+    height: 3.125rem;
+    margin-left: 6.25rem;
+  }
+  .header__title {
+    color: #901C1C;
+    margin-right: 6.25rem;
+  }
+  @media screen and (max-width: 768px) {
+    .header {
+      flex-direction: column;
+      height: auto;
+    }
+    .header a {
+      display: block;
+      text-align: center;
+    }
+    .header__logo {
+      margin: 3rem 0;
+    }
+    .header__title {
+      margin-right: 0;
+    }
+  }

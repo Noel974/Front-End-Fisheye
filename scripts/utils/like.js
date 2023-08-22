@@ -1,4 +1,3 @@
-// Exporte la classe Likes pour qu'elle puisse être utilisée dans d'autres fichiers
 export class Likes {
     // Constructeur de la classe Likes
     constructor(likes) {
@@ -27,5 +26,36 @@ export class Likes {
 
         // Renvoie l'élément div créé
         return div;
+    }
+}
+
+export class LikesManager {
+    constructor() {
+        // Tableau pour stocker les likes
+        this.likesArray = [];
+    }
+
+    // Initialise le tableau des likes en se basant sur le tableau des médias
+    initializeLikes(mediaArray) {
+        this.likesArray = mediaArray.map(media => media.likes);
+    }
+
+    // Augmente les likes pour un média spécifique et renvoie le nombre de likes mis à jour
+    increaseLikes(mediaId) {
+        // Recherche l'index du média dans le tableau des likes
+        const mediaIndex = this.likesArray.findIndex((likes, index) => {
+            if (this.mediaArray[index].id === mediaId) {
+                return true;
+            }
+        });
+
+        // Si le média est trouvé, augmente les likes et renvoie le nombre mis à jour
+        if (mediaIndex !== -1) {
+            this.likesArray[mediaIndex]++;
+            return this.likesArray[mediaIndex];
+        }
+
+        // Si le média n'est pas trouvé, renvoie -1 pour indiquer l'échec
+        return -1;
     }
 }

@@ -1,0 +1,53 @@
+.form {
+    display: flex;
+    width: 100%;
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  .form div {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    align-items: self-start;
+  }
+  .form label {
+    color: #312E2E;
+    font-size: 2.25rem;
+  }
+  .form input,
+  .form textarea {
+    width: 100%;
+    height: 4.25rem;
+    border: none;
+    border-radius: 0.313rem;
+  }
+  .form textarea {
+    height: 16rem;
+  }
+  .form .text-control {
+    font-size: 1.5rem;
+  }
+  .form .formData[data-error]::after {
+    content: attr(data-error);
+    display: block;
+    margin: 0.5rem 0;
+    font-size: 1.125rem;
+    color: #ce1f31;
+    opacity: 0;
+    transition: all 0.3s;
+  }
+  .form .formData[data-error-visible=true]::after {
+    opacity: 1;
+  }
+  .form .formData[data-error-visible=true] .text-control {
+    border: 2px solid #ce1f31;
+  }
+  @media screen and (max-width: 768px) {
+    .form label {
+      font-size: 1.5rem;
+    }
+  }
+  
+  .no-scroll {
+    overflow: hidden;
+  }

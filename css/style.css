@@ -1,155 +1,27 @@
 @import url("photographer.css");
+@import url("Components/header.css");
+@import url("Components/sorter.css");
+@import url("Components/modal.css");
+@import url("Components/lightbox.css");
+@import url("Components/form.css");
+@import url("Components/priceandlike.css");
+@import url("Components/media.css");
 
-body {
-    font-family: "DM Sans", sans-serif;
-    margin: 0;
-}
+@import url("pages/index.css");
+@import url("pages/photographer.css");
 
+@import url("Base/base.css");
+@import url("Base/brtn.css");
+@import url("Base/icon.css");
 
-header {
-    display: flex;
-    flex-direction: row;
-    justify-content: space-between;
-    align-items: center;
-    height: 90px;
-}
-
-h1 {
-    color: #901C1C;
-    margin-right: 100px;
-}
-
-.logo {
-    height: 50px;
-    margin-left: 100px;
-}
-
-.photographer_section {
-    display: grid;
-    grid-template-columns: 1fr 1fr 1fr;
-    gap: 70px;
-    margin-top: 100px;
-}
-
-.photographer_section article {
-    justify-self: center;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    flex-direction: column;
-}
-
-.photographer_section article h2 {
-    color: #D3573C;
-    margin-bottom: 0;
-    text-align: center;
-}
-
-.photographer_section article img {
-    height: 12.5rem;
-    width: 12.5rem;
-    object-fit: cover;
-    border-radius: 50%;
-    margin-top: 0.5rem;
-    box-shadow: 0 0 1rem rgba(185, 184, 184, 0.685);
-}
-.photographer_section article p {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    line-height: 1.5;
-    margin-top: 0;
-    text-align: center;
-  }
-.photographer_section article p .location {
-    font-size: 1.5rem;
-    color: #901C1C;
-  }
-
-  #contact_modal {
-    display: none;
-    position: fixed;
-    top: 0;
+.subContent {
+    position: absolute;
     right: 0;
     bottom: 0;
-    left: 0;
-    height: 100%;
-    padding-top: 4rem;
-    z-index: 99;
-    background: rgba(196, 196, 196, 0.4);
-    overflow: auto;
-  }
-  @media screen and (max-width: 1024px) {
-    #contact_modal {
-      padding-top: 0;
-    }
-  }
-  
-  .modal {
-    border-radius: 0.313rem;
-    background-color: #DB8876;
-    width: 50%;
+    z-index: 10;
     display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: space-between;
-    padding: 2.188rem;
-    margin: auto;
-  }
-  .modal__header {
-    display: flex;
-    flex-direction: row;
-    justify-content: space-between;
-    width: 100%;
-  }
-  .modal__header__title {
-    font-size: 4rem;
-    font-weight: normal;
-    text-align: left;
-    margin-top: 0;
-  }
+}
 
-  .form {
-    display: flex;
-    width: 100%;
-    flex-direction: column;
-    align-items: flex-start;
-  }
-  .form div {
-    display: flex;
-    flex-direction: column;
-    width: 100%;
-    align-items: self-start;
-  }
-  .form label {
-    color: #312E2E;
-    font-size: 2.25rem;
-  }
-  .form input,
-  .form textarea {
-    width: 100%;
-    height: 4.25rem;
-    border: none;
-    border-radius: 0.313rem;
-  }
-  .form textarea {
-    height: 16rem;
-  }
-  .form .text-control {
-    font-size: 1.5rem;
-  }
-  .form .formData[data-error]::after {
-    content: attr(data-error);
-    display: block;
-    margin: 0.5rem 0;
-    font-size: 1.125rem;
-    color: #ce1f31;
-    opacity: 0;
-    transition: all 0.3s;
-  }
-  .form .formData[data-error-visible=true]::after {
-    opacity: 1;
-  }
-  .form .formData[data-error-visible=true] .text-control {
-    border: 2px solid #ce1f31;
-  }
+.media__item {
+    position: relative;
+}
