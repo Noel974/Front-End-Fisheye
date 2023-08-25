@@ -1,77 +1,62 @@
 import { PhotographerApi, MediaApi } from '../Api/api.js'
-
 import { Media } from '../factories/Media.js'
-
 import { Photographer } from '../models/index.js'
 import { PhotographerCard } from '../templates/index.js'
 import { VideoCard } from '../templates/VideoCard.js'
 import { PictureCard } from '../templates/PictureCard.js'
 import { PriceAndLikesCard } from '../templates/priceandlike.js'
 import { SorterForm } from '../templates/SorterForm.js'
-// Importez LikesManager ici
-import { LikesManager } from '../utils/like.js';
-
 import { Sorter } from '../utils/Sorter.js'
 import { Lightbox } from '../utils/Lightbox.js'
 
 export class PhotographerPage {
     constructor() {
-        // Elements du DOM
+        // Initialisation des éléments du DOM
         this.main = document.getElementById('main')
         this.mediaSection = document.querySelector('.media')
 
-        // Api
+        // Initialisation des API
         this.photographerApi = new PhotographerApi('/data/photographers.json')
         this.mediaApi = new MediaApi('/data/photographers.json')
 
-        // Url de la page
+        // Récupération de l'URL de la page
         this.url = new URL(window.location)
 
-        // Id du photographe
+        // Récupération de l'ID du photographe depuis l'URL
         this.id = this.getPhotographerIdFromUrl()
-
-        // Photographes
-        this.photographerFiltered = null
-
-        // Media filtrés
-        this.mediaFiltered = []
-
-        // Créez une instance de LikesManager
-        this.likesManager = new LikesManager();
     }
 
+    // Méthode pour obtenir l'ID du photographe depuis l'URL
     getPhotographerIdFromUrl() {
         const params = new URLSearchParams(this.url.search)
-
-        // Retourne l'id du photographe contenu dans le lien
         return parseInt(params.get('photographerId'), 10)
     }
 
-    // Retourne la valeur de 'sorter' de l'url de la page
+    // Méthode pour obtenir le paramètre 'sorter' de l'URL
     getSorterFromURL() {
         const params = this.url.searchParams
         return params.get('sorter')
     }
 
+    // Méthode pour récupérer les données du photographe filtré
     async fetchPhotographerFiltered() {
-        // Retourne le tableau de photographes
         const photographersData = await this.photographerApi.getPhotographers()
         const photographerDataFiltered = this.findPhotographer(
             photographersData,
             this.id
         )
-
         return new Photographer(photographerDataFiltered)
     }
 
+    // Méthode pour trouver le photographe dans la liste des photographes
     findPhotographer(photographers, photographerId) {
         return photographers.find(
             (photographer) => photographer.id === photographerId
         )
     }
 
+    // Méthode pour récupérer les médias filtrés
     async fetchMediaFiltered() {
-        // Retourne le tableau des media du photographe correspondant à l'id récupéré
         const mediaData = await this.mediaApi.getMedia()
         const mediaDataFiltered = this.filterMedia(mediaData, this.id)
         const videoData = mediaDataFiltered
@@ -84,48 +69,41 @@ export class PhotographerPage {
         return videoData.concat(pictureData)
     }
 
+    // Méthode pour filtrer les médias du photographe
     filterMedia(media, photographerId) {
-        // Retourne les media du photographe
         return media.filter((media) => media.photographerId === photographerId)
     }
 
+    // Méthode pour afficher l'en-tête du photographe
     displayPhotographerHeader(photographer) {
         const photographercard = new PhotographerCard(photographer)
-
-        // Affiche l'entête du photographe
         photographercard.getPhotographerHeader()
     }
 
+    // Méthode pour afficher le prix et les likes des médias
     displayPriceAndLikesOfMedia(likes, price) {
         const priceAndLikesCard = new PriceAndLikesCard(likes, price)
         const divItem = priceAndLikesCard.getPriceAndLikesDom()
-
-        // Affiche la div du prix et des likes
         this.main.appendChild(divItem)
     }
 
+    // Méthode pour obtenir les likes à partir des données des médias
     getLikes(data) {
         let array = []
-
         for (const element of data) {
             array.push(element.likes)
         }
-
-        // Retourne un tableau contenant les likes de chaque media
         return array
     }
 
+    // Méthode pour calculer la somme des likes
     getSumLikes(array) {
-        let sumLikes
-
-        sumLikes = array.reduce(
+        return array.reduce(
             (previousValue, currentValue) => previousValue + currentValue
         )
-
-        // Retourne la somme total de likes des media
-        return sumLikes
     }
 
+    // Méthode pour afficher les médias triés par likes
     displayMediaByLike(media, photographer) {
         const mediaSorted = new Sorter(media, 'like').mediaSorted()
 
@@ -146,59 +124,42 @@ export class PhotographerPage {
         Lightbox.init()
     }
 
-    async init() {
-        // Récupère les datas du photographe
-        this.photographerFiltered = await this.fetchPhotographerFiltered()
+   // Méthode d'initialisation
+async init() {
+    this.photographerFiltered = await this.fetchPhotographerFiltered();
 
-        // Affiche l'entête du photographe
-        this.displayPhotographerHeader(this.photographerFiltered)
+    // Afficher l'en-tête du photographe
+    this.displayPhotographerHeader(this.photographerFiltered);
 
-        // Récupère les datas des media dans un tableau
-        this.mediaFiltered = await this.fetchMediaFiltered()
+    this.mediaFiltered = await this.fetchMediaFiltered();
+    const likes = this.getLikes(this.mediaFiltered);
+    const sumLikes = this.getSumLikes(likes);
 
-        // likes des media
-        const likes = this.getLikes(this.mediaFiltered)
-
-        // le total des likes des media
-        const sumLikes = this.getSumLikes(likes)
-
-        // Affiche le total du prix et des likes des media
-        this.displayPriceAndLikesOfMedia(
-            sumLikes,
-            this.photographerFiltered.price
-        )
+    // Afficher le prix et les likes des médias et mettre à jour le total des likes
+    this.displayPriceAndLikesOfMedia(
+        sumLikes,
+        this.photographerFiltered.price
+    );
 
         let sorter = this.getSorterFromURL()
 
-        /*
-            si la valeur du trieur est fausse,
-            l'utilisateur est redirigé vers le trieur par défaut : like
-        */
-        if (!['like', 'date', 'title'].includes(this.sorter)) {
-            /* 
-                Met à jour le paramètre 'sorter' dans l'url de la page
-                Rafraîchi le DOM
-            */
+        if (!['like', 'date', 'title'].includes(sorter)) {
             this.url.searchParams.set('sorter', 'like')
             window.history.pushState({}, '', this.url)
             sorter = 'like'
         }
 
-        // Formulaire qui affiche les media triés en fonction du bouton de tri
         const sorterForm = new SorterForm(
             this.mediaFiltered,
             this.photographerFiltered,
             sorter
         )
 
-        // Initialise le formulaire des media
         sorterForm.init()
 
-        // Afficher le nom du photographe dans le formulaire de contact
         const photographerNameContactForm = document.querySelector(
             '.modal__header__photographer_name'
         )
-
         photographerNameContactForm.textContent = `${this.photographerFiltered.name}`
     }
 }

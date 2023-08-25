@@ -1,46 +1,69 @@
 import { Price } from '../utils/price.js';
-import { Likes, LikesManager } from '../utils/like.js'; // Importe également LikesManager
+import { Likes } from '../utils/like.js';
+import { LikesManager } from '../utils/like.js'; // Assurez-vous que le chemin est correct
 
 export class PriceAndLikesCard {
-    constructor(likes, price) {
+    constructor(likes, price, mediaArray) {
+        // Création d'instances de Price, Likes et LikesManager
         this.price = new Price(price);
-        this.likesManager = new LikesManager(); // Crée une instance de LikesManager
         this.likes = new Likes(likes);
-        this.totalLikes = 0; // Initialisez le total des likes à zéro
+        this.likeClicked = false;
+        
+        // Initialisation du total des likes avec la valeur initiale de likes
+        this.totalLikes = this.likes;
+        this.updateTotalLikesContent(); // Mettre à jour l'affichage du total des likes dans le DOM
+
+        // Création d'une instance de LikesManager pour gérer les likes
+        this.likesManager = new LikesManager();
+        this.likesManager.initializeLikes(mediaArray);
+
+        // Associer un gestionnaire d'événements au clic sur le bouton de like
+        this.likes.getLikesDom().querySelector('.fa-heart').addEventListener('click', () => {
+            this.handleLike(mediaArray[0].id); // Remplacez par l'ID du média approprié
+        });
     }
 
-    // Renvoie un élément div du DOM représentant la carte de prix et de likes
+    // Crée et renvoie un élément div du DOM représentant la carte de prix et de likes
     getPriceAndLikesDom() {
         const div = document.createElement('div');
         div.setAttribute('class', 'priceAndLikes');
 
+        // Mettre à jour le nombre de likes affiché en fonction du total des likes
+        this.likes.updateLikesCount(this.likes.likes);
+
+        // Ajouter les éléments DOM pour les likes et le prix à la div
         div.appendChild(this.likes.getLikesDom());
         div.appendChild(this.price.getPriceDom());
 
         return div;
     }
 
-    // Utilisez cette méthode pour augmenter les likes en utilisant LikesManager
-    augmenterLikes(mediaId) {
-        const likesMisAJour = this.likesManager.augmenterLikes(mediaId);
-        if (likesMisAJour !== -1) {
-            this.totalLikes++; // Incrémente le total des likes
-            const contenuLike = this.likes.getLikesDom().querySelector('.likeContent');
-            contenuLike.querySelector('.likes').textContent = likesMisAJour;
+    // Mettre à jour le total des likes en fonction des likes actuels des médias
+    updateTotalLikes() {
+        this.totalLikes = this.likesManager.calculateTotalLikes();
+    }
+
+    // Gérer l'augmentation et la diminution des likes
+    handleLike(mediaId) {
+        const updatedLikes = this.likeClicked
+            ? this.likesManager.decrementLikes(mediaId)
+            : this.likesManager.incrementLikes(mediaId);
     
-            // Met à jour l'affichage du total des likes
-            const totalLikesElement = document.querySelector('.total-likes');
-            if (totalLikesElement) {
-                totalLikesElement.textContent = `Total des likes : ${this.totalLikes}`;
-            }
+        if (updatedLikes !== -1) {
+            this.likes.likes = updatedLikes; // Mettre à jour les likes dans l'instance de Likes
+            this.likes.updateDomContent(); // Mettre à jour l'affichage des likes dans le DOM
+            this.likeClicked = !this.likeClicked;
+            this.updateTotalLikes(); // Mettre à jour le total des likes
+            this.updateTotalLikesContent(); // Mettre à jour le contenu du total des likes dans le DOM
         }
     }
 
-    // Méthode pour afficher le total des likes
-    displayTotalLikes() {
-        const totalLikesElement = document.createElement('div');
-        totalLikesElement.setAttribute('class', 'total-likes');
-        totalLikesElement.textContent = `Total des likes : ${this.totalLikes}`;
-        return totalLikesElement;
+    // Mettre à jour le contenu du total des likes dans le DOM
+    updateTotalLikesContent() {
+        const totalLikesElement = this.likes.getLikesDom().querySelector('.likes');
+        
+        if (totalLikesElement) {
+            totalLikesElement.textContent = `Total des likes : ${this.totalLikes}`;
+        }
     }
 }

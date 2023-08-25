@@ -1,63 +1,85 @@
+// Classe Likes pour gérer les likes individuels
 export class Likes {
-    // Constructeur de la classe Likes
     constructor(likes) {
-        // Initialise la propriété likes de l'objet Likes avec la valeur passée en paramètre
-        this.likes = likes; // Nombre de likes
+        this.likes = likes;
     }
 
-    // Méthode qui crée et renvoie un élément div du DOM représentant les likes
+    // Crée et renvoie un élément div du DOM représentant les likes
     getLikesDom() {
-        // Crée un élément div
         const div = document.createElement('div');
-
-        // Ajoute la classe CSS 'likeContent' à l'élément div
-        div.setAttribute('class', 'likeContent');
-
-        // Définit le contenu HTML de l'élément div en utilisant une expression littérale de gabarit pour insérer la valeur de la propriété likes dans le code HTML
+        div.classList.add('likeContent');
+        
         div.innerHTML = `
             <span class="likes">${this.likes}</span>
-            <i 
-                class="fa-solid fa-heart icon icon--black" 
-                data-fa-transform="up-0.75" 
-                aria-label="likes"
-            >
-            </i>
+            <i class="fa-solid fa-heart icon icon--black" data-fa-transform="up-0.75" aria-label="likes"></i>
         `;
-
-        // Renvoie l'élément div créé
+        
         return div;
+    }
+
+    // Incrémente le nombre de likes
+    increaseLikes() {
+        this.likes++;
+    }
+
+    // Décrémente le nombre de likes, si possible
+    decreaseLikes() {
+        if (this.likes > 0) {
+            this.likes--;
+        }
+    }
+
+    // Met à jour le nombre de likes affiché
+    updateLikesCount(updatedLikes) {
+        const likesElement = this.getLikesDom();
+        likesElement.querySelector('.likes').textContent = updatedLikes;
+    }
+
+    // Met à jour le contenu DOM avec le nombre de likes actuel
+    updateDomContent() {
+        const likesElement = document.querySelector('.likes');
+        if (likesElement) {
+            likesElement.textContent = this.likes;
+        }
     }
 }
 
+// Classe LikesManager pour gérer les likes globaux
 export class LikesManager {
     constructor() {
-        // Tableau pour stocker les likes
-        this.likesArray = [];
+        this.mediaArray = []; // Assurez-vous d'initialiser mediaArray
     }
 
     // Initialise le tableau des likes en se basant sur le tableau des médias
     initializeLikes(mediaArray) {
-        this.likesArray = mediaArray.map(media => media.likes);
+        this.mediaArray = mediaArray;
     }
 
-    // Augmente les likes pour un média spécifique et renvoie le nombre de likes mis à jour
-    increaseLikes(mediaId) {
-        // Recherche l'index du média dans le tableau des likes
-        const mediaIndex = this.likesArray.findIndex((likes, index) => {
-            if (this.mediaArray[index].id === mediaId) {
-                return true;
-            }
-        });
+    // Incrémente les likes pour un média donné
+    incrementLikes(mediaId) {
+        const media = this.mediaArray.find(media => media.id === mediaId);
 
-        // Si le média est trouvé, augmente les likes et renvoie le nombre mis à jour
-        if (mediaIndex !== -1) {
-            this.likesArray[mediaIndex]++;
-            return this.likesArray[mediaIndex];
+        if (media) {
+            media.likes.increaseLikes();
+            return media.likes.likes;
         }
-// Appelez la méthode augmenterLikes depuis votre instance de PriceAndLikesCard
-priceAndLikesCard.augmenterLikes(mediaId);
-
-        // Si le média n'est pas trouvé, renvoie -1 pour indiquer l'échec
         return -1;
+    }
+
+    // Décrémente les likes pour un média donné
+    decrementLikes(mediaId) {
+        const media = this.mediaArray.find(media => media.id === mediaId);
+
+        if (media) {
+            media.likes.decreaseLikes();
+            return media.likes.likes;
+        }
+        return -1;
+    }
+
+    // Calcule la somme totale des likes pour tous les médias
+    calculateTotalLikes() {
+        const totalLikes = this.mediaArray.reduce((total, media) => total + media.likes.likes, 0);
+        return totalLikes;
     }
 }

@@ -1,25 +1,19 @@
-export { VideoCard }
-class VideoCard {
+export class VideoCard {
     constructor(video, photographer) {
-        this.id = video.id
-        this.title = video.title
-        this.video = video.video
-        this.likes = video.likes
-        this.date = video.date
-        this.price = video.price
-        this.photographerId = video.photographerId
-        this.photographerName = photographer.name
+        // Initialisation des propriétés de la vidéo
+        this.id = video.id;
+        this.title = video.title;
+        this.video = video.video;
+        this.likes = video.likes;
+        this.photographerName = photographer.name;
+        this.likeButton = null;
     }
 
-    getVideoCardDom() {
-        const mediaItem = document.createElement('div');
-        const videoName = this.video.replace('.mp4', '').replaceAll('_', ' ');
-    
-        mediaItem.setAttribute('class', 'media__item');
-    
-        const likeButton = document.createElement('button');
-        likeButton.setAttribute('class', 'like-button');
-        likeButton.innerHTML = `
+    // Méthode pour créer le bouton de like
+    createLikeButton() {
+        this.likeButton = document.createElement('button');
+        this.likeButton.setAttribute('class', 'like-button');
+        this.likeButton.innerHTML = `
             <div class="subContent">
                 <span class="likes">${this.likes}</span>
                 <button class="like-button">
@@ -27,12 +21,23 @@ class VideoCard {
                 </button>
             </div>
         `;
-    
-        likeButton.addEventListener('click', () => {
-            this.likes++; // Augmenter le compteur de likes
-            likeButton.querySelector('.likes').textContent = this.likes; // Mettre à jour l'affichage des likes
+        // Gestionnaire d'événements pour incrémenter les likes
+        this.likeButton.addEventListener('click', () => {
+            this.likes++;
+            this.likeButton.querySelector('.likes').textContent = this.likes;
         });
-    
+    }
+
+    // Méthode pour obtenir l'élément DOM de la carte vidéo
+    getVideoCardDom() {
+        this.createLikeButton(); // Crée le bouton de like
+
+        const mediaItem = document.createElement('div');
+        const videoName = this.video.replace('.mp4', '').replaceAll('_', ' ');
+
+        mediaItem.setAttribute('class', 'media__item');
+
+        // Crée l'élément DOM de la vidéo
         mediaItem.innerHTML = `
             <a href="../assets/media/${this.photographerName}/${this.video}" alt="${this.title}">
                 <video controls>
@@ -44,13 +49,13 @@ class VideoCard {
                 </div>
             </a>
         `;
-    
+
         const subContent = document.createElement('div');
         subContent.setAttribute('class', 'subContent');
-        subContent.appendChild(likeButton);
-    
-        mediaItem.appendChild(subContent);
-    
-        return mediaItem;
+        subContent.appendChild(this.likeButton); // Ajoute le bouton de like au sous-contenu
+
+        mediaItem.appendChild(subContent); // Ajoute le sous-contenu à l'élément média
+
+        return mediaItem; // Renvoie l'élément complet de la carte vidéo
     }
-}    
+}
