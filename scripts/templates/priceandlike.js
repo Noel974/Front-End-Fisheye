@@ -46,8 +46,8 @@ export class PriceAndLikesCard {
     // Gérer l'augmentation et la diminution des likes
     handleLike(mediaId) {
         const updatedLikes = this.likeClicked
-            ? this.likesManager.decrementLikes(mediaId)
-            : this.likesManager.incrementLikes(mediaId);
+            this.likesManager.decrementLikes(mediaId)
+            this.likesManager.incrementLikes(mediaId);
     
         if (updatedLikes !== -1) {
             this.likes.likes = updatedLikes; // Mettre à jour les likes dans l'instance de Likes
