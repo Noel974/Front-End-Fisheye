@@ -1,3 +1,5 @@
+import { Likes } from "../utils/like.js";
+
 export class VideoCard {
     constructor(video, photographer) {
         // Initialisation des propriétés de la vidéo
@@ -24,7 +26,10 @@ export class VideoCard {
         // Gestionnaire d'événements pour incrémenter les likes
         this.likeButton.addEventListener('click', () => {
             this.likes++;
-            this.likeButton.querySelector('.likes').textContent = this.likes;
+            this.likeButton.querySelector(".likes").textContent = this.likes;
+            // Mettre à jour le total des likes
+            const like = new Likes();
+            like.totalSumCalcul();
         });
     }
 

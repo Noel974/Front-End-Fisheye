@@ -9,8 +9,11 @@ import { SorterForm } from '../templates/SorterForm.js'
 import { Sorter } from '../utils/Sorter.js'
 import { Lightbox } from '../utils/Lightbox.js'
 
+import { LikesManager } from '../utils/like.js';
+
 export class PhotographerPage {
     constructor() {
+        
         // Initialisation des éléments du DOM
         this.main = document.getElementById('main')
         this.mediaSection = document.querySelector('.media')
@@ -24,6 +27,8 @@ export class PhotographerPage {
 
         // Récupération de l'ID du photographe depuis l'URL
         this.id = this.getPhotographerIdFromUrl()
+
+        this.likesManager = new LikesManager();
     }
 
     // Méthode pour obtenir l'ID du photographe depuis l'URL
@@ -82,9 +87,10 @@ export class PhotographerPage {
 
     // Méthode pour afficher le prix et les likes des médias
     displayPriceAndLikesOfMedia(likes, price) {
-        const priceAndLikesCard = new PriceAndLikesCard(likes, price)
+        const priceAndLikesCard = new PriceAndLikesCard(likes, price, this.mediaFiltered);
         const divItem = priceAndLikesCard.getPriceAndLikesDom()
         this.main.appendChild(divItem)
+        this.likesManager.initializeLikes(this.mediaFiltered);
     }
 
     // Méthode pour obtenir les likes à partir des données des médias
@@ -103,29 +109,30 @@ export class PhotographerPage {
         )
     }
 
-    // Méthode pour afficher les médias triés par likes
-    displayMediaByLike(media, photographer) {
-        const mediaSorted = new Sorter(media, 'like').mediaSorted()
+// Méthode pour afficher les médias triés par likes
+displayMediaByLike(media, photographer) {
+    const mediaSorted = new Sorter(media, 'like').mediaSorted();
 
-        mediaSorted.forEach((media) => {
-            if (media.video) {
-                const videoCard = new VideoCard(media, photographer)
-                this.mediaSection.appendChild(videoCard.getVideoCardDom())
-                this.main.appendChild(this.mediaSection)
-            } else if (media.image) {
-                const pictureCard = new PictureCard(media, photographer)
-                this.mediaSection.appendChild(pictureCard.getPictureCardDom())
-                this.main.appendChild(this.mediaSection)
-            } else {
-                throw new Error('Unknown type format')
-            }
-        })
+    mediaSorted.forEach((media) => {
+        if (media.video) {
+            const videoCard = new VideoCard(media, photographer, this.likesManager);
+            this.mediaSection.appendChild(videoCard.getVideoCardDom());
+        } else if (media.image) {
+            const pictureCard = new PictureCard(media, photographer, this.likesManager);
+            this.mediaSection.appendChild(pictureCard.getPictureCardDom());
+        } else {
+            throw new Error('Unknown type format');
+        }
+    });
 
-        Lightbox.init()
-    }
+    this.main.appendChild(this.mediaSection);
+
+    Lightbox.init();
+}
+
 
    // Méthode d'initialisation
-async init() {
+   async init() {
     this.photographerFiltered = await this.fetchPhotographerFiltered();
 
     // Afficher l'en-tête du photographe
@@ -135,34 +142,47 @@ async init() {
     const likes = this.getLikes(this.mediaFiltered);
     const sumLikes = this.getSumLikes(likes);
 
-    // Afficher le prix et les likes des médias et mettre à jour le total des likes
+    this.likesManager.initializeLikes(this.mediaFiltered); // Initialise avec les médias filtrés
+
+    // Afficher le prix et les likes des médias
     this.displayPriceAndLikesOfMedia(
         sumLikes,
         this.photographerFiltered.price
     );
 
-        let sorter = this.getSorterFromURL()
+    // Mettre à jour le total des likes
+    this.likesManager.totalSumCalcul();
 
-        if (!['like', 'date', 'title'].includes(sorter)) {
-            this.url.searchParams.set('sorter', 'like')
-            window.history.pushState({}, '', this.url)
-            sorter = 'like'
-        }
+    // Afficher les médias triés par likes
+    this.displayMediaByLike(this.mediaFiltered, this.photographerFiltered);
 
-        const sorterForm = new SorterForm(
-            this.mediaFiltered,
-            this.photographerFiltered,
-            sorter
-        )
+    let sorter = this.getSorterFromURL();
 
-        sorterForm.init()
-
-        const photographerNameContactForm = document.querySelector(
-            '.modal__header__photographer_name'
-        )
-        photographerNameContactForm.textContent = `${this.photographerFiltered.name}`
+    if (!['like', 'date', 'title'].includes(sorter)) {
+        this.url.searchParams.set('sorter', 'like');
+        window.history.pushState({}, '', this.url);
+        sorter = 'like';
     }
+
+    const sorterForm = new SorterForm(
+        this.mediaFiltered,
+        this.photographerFiltered,
+        sorter
+    );
+
+    sorterForm.init();
+
+    const photographerNameContactForm = document.querySelector(
+        '.modal__header__photographer_name'
+    );
+    photographerNameContactForm.textContent = `${this.photographerFiltered.name}`;
+}
 }
 
-const photographerPage = new PhotographerPage()
-photographerPage.init()
+// Créez une instance de PhotographerPage et initialisez-la
+const photographerPage = new PhotographerPage();
+photographerPage.init();
+
+
+
+
