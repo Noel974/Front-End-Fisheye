@@ -6,7 +6,13 @@
   }
   .media__item {
     position: relative;
-}
+    transition: box-shadow 0.3s ease; /* Ajoutez une transition pour une animation fluide */
+  }
+  
+  .media__item:hover {
+    transform: scale(1.05);
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.3), 0 0 5px #e9e9e987; /* Ajoutez la couleur à l'ombre */
+    }
   .media__item img,
   .media__item video {
     width: 100%;

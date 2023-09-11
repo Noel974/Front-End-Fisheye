@@ -1,4 +1,6 @@
-import { Likes } from "../utils/like.js";
+import { Likes, LikesManager } from "../utils/like.js";
+
+import medias from '../../data/photographers.json' assert {type : 'json'};
 
 export class VideoCard {
     constructor(video, photographer) {
@@ -9,6 +11,9 @@ export class VideoCard {
         this.likes = video.likes;
         this.photographerName = photographer.name;
         this.likeButton = null;
+        this.likesManager = new LikesManager();
+        this.likesManager.initializeLikes(medias.media)
+
     }
 
     // Méthode pour créer le bouton de like
@@ -25,13 +30,30 @@ export class VideoCard {
         `;
         // Gestionnaire d'événements pour incrémenter les likes
         this.likeButton.addEventListener('click', () => {
-            this.likes++;
-            this.likeButton.querySelector(".likes").textContent = this.likes;
-            // Mettre à jour le total des likes
+            const mediaId = this.id; // Récupérer l'identifiant du média
+            const currentLikes = parseInt(this.likeButton.querySelector(".likes").textContent); // Obtenir le nombre actuel de likes
+            // console.log(medias.media.find(x=> x.id == mediaId))
+            console.log('currentLike',currentLikes)
+            console.log('histoLike',medias.media.find(x=> x.id == mediaId).likes)
+            if (currentLikes > medias.media.find(x=> x.id == mediaId).likes) {
+                // Si des likes sont déjà présents, décrémentez-les
+                console.log('!j incremente')
+                const newLikes = this.likesManager.modifyLikes(mediaId, 'decrement');
+               
+                this.likeButton.querySelector(".likes").textContent = newLikes;
+            } else {
+                // Sinon, incrémente les likes
+               console.log('j incremente')
+                const newLikes = this.likesManager.modifyLikes(mediaId, 'increment');
+                this.likeButton.querySelector(".likes").textContent = newLikes;
+            }
+        
+            // Mettre à jour le total des likes de tous les médias
             const like = new Likes();
             like.totalSumCalcul();
         });
     }
+
 
     // Méthode pour obtenir l'élément DOM de la carte vidéo
     getVideoCardDom() {

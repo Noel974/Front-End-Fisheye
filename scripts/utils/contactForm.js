@@ -15,15 +15,41 @@ function displayModal() {
     document.body.setAttribute('class', 'no-scroll')
 }
 
-// Ferme le formulaire de contact
-btnCloseModal.addEventListener('click', closeModal)
+// Ancien code pour fermer le modal en cliquant sur le bouton
+btnCloseModal.addEventListener('click', closeModal);
 
+// Fonction pour fermer le formulaire de contact
 function closeModal() {
-    modal.style.display = 'none'
+    modal.style.display = 'none';
 
     // Désactiver le no-scroll sur le body en supprimant .no-scroll
-    document.body.removeAttribute('class')
+    document.body.removeAttribute('class');
 }
+
+// Fonction pour gérer la navigation avec les touches fléchées
+function handleArrowKeys(event) {
+    if (modal.style.display === 'block') {
+        if (event.key === 'ArrowUp') {
+            // Code pour aller à l'élément précédent (si applicable)
+            // Par exemple, sélectionnez l'élément précédent dans une liste d'éléments
+            // Assurez-vous que le focus est sur l'élément souhaité
+        } else if (event.key === 'ArrowDown') {
+            // Code pour aller à l'élément suivant (si applicable)
+            // Par exemple, sélectionnez l'élément suivant dans une liste d'éléments
+            // Assurez-vous que le focus est sur l'élément souhaité
+        }
+    }
+}
+
+// Écoutez les événements de touche pour la navigation avec les touches fléchées
+document.addEventListener('keydown', handleArrowKeys);
+
+// Nouveau code pour fermer le modal avec la touche "Échap"
+document.addEventListener('keydown', function(event) {
+    if (event.key === 'Escape') {
+        closeModal();
+    }
+});
 
 form.addEventListener('submit', validateForm)
 

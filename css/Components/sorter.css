@@ -7,23 +7,38 @@
   font-size: 1.125rem;
   font-weight: 700;
 }
-.sorter___title {
+
+.sorter:focus {
+  outline: none; /* Supprime la bordure par défaut sur le focus */
+  box-shadow: 0 0 5px 2px rgba(0, 0, 0, 0.5); /* Ajoutez une ombre pour indiquer le focus */
+}
+
+.sorter__title {
   margin: 0;
 }
+
 .sorter__list {
   display: none;
   list-style: none;
   margin: 0;
   padding: 0;
 }
+
+/* Ajoutez des styles pour le focus sur les éléments de la liste */
+.sorter__list li:focus {
+  outline: none; /* Supprime la bordure par défaut sur le focus */
+  background-color: #f0f0f0; /* Changez la couleur d'arrière-plan pour indiquer le focus */
+}
+
 @media screen and (max-width: 768px) {
   .sorter {
-    flex-direction: column;
-    align-items: center;
-    width: 85%;
-    margin: auto;
+      flex-direction: column;
+      align-items: center;
+      width: 85%;
+      margin: auto;
   }
+
   .sorter__title {
-    margin: 2rem 0 1rem;
+      margin: 2rem 0 1rem;
   }
 }

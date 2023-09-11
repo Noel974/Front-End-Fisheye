@@ -1,8 +1,13 @@
+// Importation des classes Likes et LikesManager depuis un fichier "like.js"
 import { Likes, LikesManager } from "../utils/like.js";
 
-// Pour PictureCard
+// Importation des données des médias depuis le fichier JSON des photographes
+import medias from '../../data/photographers.json' assert { type: 'json' };
+
+// Définition de la classe PictureCard
 export class PictureCard {
     constructor(picture, photographer) {
+        // Initialisation des propriétés de la carte média (image)
         this.id = picture.id;
         this.title = picture.title;
         this.image = picture.image;
@@ -10,12 +15,12 @@ export class PictureCard {
         this.photographerName = photographer.name;
         this.likeButton = null;
         this.likesManager = new LikesManager();
-
-        this.decrementButton = document.createElement('button');
-this.decrementButton.setAttribute('class', 'decrement-button');
+        
+        // Initialisation du gestionnaire de likes avec les données des médias
+        this.likesManager.initializeLikes(medias.media)
     }
 
-    // Crée le bouton de like et ajoute un gestionnaire d'événements
+    // Méthode pour créer le bouton de like et ajouter un gestionnaire d'événements
     createLikeButton() {
         this.likeButton = document.createElement('button');
         this.likeButton.setAttribute('class', 'like-button');
@@ -27,33 +32,29 @@ this.decrementButton.setAttribute('class', 'decrement-button');
                 </button>
             </div>
         `;
-        // Gestionnaire d'événements pour incrémenter les likes
+
+        // Gestionnaire d'événements lorsque le bouton de like est cliqué
         this.likeButton.addEventListener('click', () => {
             const mediaId = this.id; // Récupérer l'identifiant du média
-            const newLikes = this.likesManager.modifyLikes(mediaId, 'increment'); // Appeler la méthode pour incrémenter les likes
-            this.likeButton.querySelector(".likes").textContent = newLikes;
-            // Mettre à jour le total des likes
+            const currentLikes = parseInt(this.likeButton.querySelector(".likes").textContent); // Obtenir le nombre actuel de likes
+            
+            if (currentLikes > medias.media.find(x => x.id == mediaId).likes) {
+                // Si des likes sont déjà présents, décrémentez-les
+                const newLikes = this.likesManager.modifyLikes(mediaId, 'decrement');
+                this.likeButton.querySelector(".likes").textContent = newLikes;
+            } else {
+                // Sinon, incrémente les likes
+                const newLikes = this.likesManager.modifyLikes(mediaId, 'increment');
+                this.likeButton.querySelector(".likes").textContent = newLikes;
+            }
+        
+            // Mettre à jour le total des likes de tous les médias
             const like = new Likes();
-            this.likesManager.totalSumCalcul();
             like.totalSumCalcul();
         });
-
-        // Gestionnaire d'événements pour décrémenter les likes
-        this.decrementButton.addEventListener('click', () => {
-            const mediaId = this.id; // Récupérer l'identifiant du média
-            const newLikes = this.likesManager.modifyLikes(mediaId, 'decrement'); // Appeler la méthode pour décrémenter les likes
-
-            // Mettre à jour l'affichage des likes
-            this.likeButton.querySelector(".likes").textContent = newLikes;
-
-            // Mettre à jour le total des likes
-            this.likesManager.totalSumCalcul();
-        });
-
-
     }
 
-    // Crée et renvoie un élément div du DOM représentant la carte média (image)
+    // Méthode pour créer et renvoyer un élément div du DOM représentant la carte média (image)
     getPictureCardDom() {
         this.createLikeButton();
 

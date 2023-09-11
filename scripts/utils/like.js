@@ -64,23 +64,35 @@ export class LikesManager {
             this.mediaArray = [];
         }
     }
-
-    modifyLikes(mediaId, action) {
+    getLikes(mediaId) {
         const media = this.mediaArray.find(media => media.id === mediaId);
 
         if (media) {
+            return media.likes.likes;
+        }
+
+        return 0; // Retourne 0 si le média n'est pas trouvé ou s'il n'a pas de likes
+    }
+
+    modifyLikes(mediaId, action) {
+        this.media = this.mediaArray.find(media => media.id === mediaId);
+        console.log('nb de likes ',action)
+        let mediaCurrent = {... this.media};
+        if (this.media) {
             if (action === 'increment') {
-                media.likes.updateLikes(action); // Appel de la méthode pour incrémenter les likes du média
-            } else if (action === 'decrement') {
-                media.likes.updateLikes(action); // Appel de la méthode pour décrémenter les likes du média
-            }
+                console.log('old like',this.media.likes)
+                mediaCurrent.likes = parseInt(this.media.likes)+1;
+                console.log('new like',this.media.likes)
+            } else if (action === 'decrement' && this.likes > 0) {
+                mediaCurrent.likes = parseInt(this.media.likes)-1;
+            }         
 
             // Calculez le total des likes après l'incrémentation ou la décrémentation
         const totalLikes = this.calculateTotalLikes();
-        return totalLikes;
+        return mediaCurrent.likes;
         }
 
-        return -1; // Retourne -1 si le média n'est pas trouvé
+        return 0; // Retourne -1 si le média n'est pas trouvé
     }
     // Met à jour le total des likes dans le DOM
     updateTotalLikesInDom() {
