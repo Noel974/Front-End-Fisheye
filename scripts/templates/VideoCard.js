@@ -37,13 +37,11 @@ export class VideoCard {
             console.log('histoLike',medias.media.find(x=> x.id == mediaId).likes)
             if (currentLikes > medias.media.find(x=> x.id == mediaId).likes) {
                 // Si des likes sont déjà présents, décrémentez-les
-                console.log('!j incremente')
                 const newLikes = this.likesManager.modifyLikes(mediaId, 'decrement');
                
                 this.likeButton.querySelector(".likes").textContent = newLikes;
             } else {
                 // Sinon, incrémente les likes
-               console.log('j incremente')
                 const newLikes = this.likesManager.modifyLikes(mediaId, 'increment');
                 this.likeButton.querySelector(".likes").textContent = newLikes;
             }

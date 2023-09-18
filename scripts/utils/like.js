@@ -76,13 +76,10 @@ export class LikesManager {
 
     modifyLikes(mediaId, action) {
         this.media = this.mediaArray.find(media => media.id === mediaId);
-        console.log('nb de likes ',action)
         let mediaCurrent = {... this.media};
         if (this.media) {
             if (action === 'increment') {
-                console.log('old like',this.media.likes)
                 mediaCurrent.likes = parseInt(this.media.likes)+1;
-                console.log('new like',this.media.likes)
             } else if (action === 'decrement' && this.likes > 0) {
                 mediaCurrent.likes = parseInt(this.media.likes)-1;
             }         
