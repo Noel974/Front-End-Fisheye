@@ -6,6 +6,7 @@
   margin: 2rem 0 0 6.25rem;
   font-size: 1.125rem;
   font-weight: 700;
+  position: relative;
 }
 
 .sorter:focus {
@@ -22,6 +23,9 @@
   list-style: none;
   margin: 0;
   padding: 0;
+  position: absolute;
+  right: 0;
+z-index: 5;
 }
 
 /* Ajoutez des styles pour le focus sur les éléments de la liste */
